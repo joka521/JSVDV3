@@ -108,15 +108,48 @@ document.getElementById('send-search').addEventListener('click',()=>{
 });
 
 
-/* STOCK: ajouter ici les véhicules réellement disponibles. */
+/* STOCK: synchronisation automatique avec le CRM JSVD Auto21. */
 const vehicles = [];
 const vehicleGrid=document.getElementById('vehicle-grid');
 const emptyStock=document.getElementById('empty-stock');
 const stockCount=document.getElementById('stock-count');
+const SUPABASE_URL='https://c--db702509-66f9-4bf1-9781-d8515a3ceae9-prod.lovable.cloud';
+const SUPABASE_KEY='sb_publishable_vwj96sGqBWgAOqDDC_m_vQ_LmSK1ytK';
+const PHOTO_BUCKET='vehicle-photos';
+function publicPhotoUrl(path){
+ return SUPABASE_URL+'/storage/v1/object/public/'+PHOTO_BUCKET+'/'+String(path).split('/').map(encodeURIComponent).join('/');
+}
+function formatVehicle(v){
+ const imagePath=Array.isArray(v.photos)?v.photos[0]:'';
+ return {
+  id:v.id,name:[v.brand,v.model,v.version].filter(Boolean).join(' '),
+  year:v.year?String(v.year):'',mileage:v.mileage!=null?Number(v.mileage).toLocaleString('fr-FR')+' km':'',
+  fuel:v.fuel||'',transmission:v.gearbox||'',power:v.power_hp?v.power_hp+' ch':'',
+  price:v.price!=null?Number(v.price).toLocaleString('fr-FR')+' €':'Prix sur demande',
+  description:v.description||'',image:imagePath?publicPhotoUrl(imagePath):'',
+ };
+}
+async function loadPublishedVehicles(){
+ stockCount.textContent='Chargement du stock…';
+ try{
+  const response=await fetch(SUPABASE_URL+'/rest/v1/vehicles?select=id,brand,model,version,year,mileage,fuel,gearbox,power_hp,price,description,photos,status&status=eq.publie&order=updated_at.desc',{
+   headers:{apikey:SUPABASE_KEY,Authorization:'Bearer '+SUPABASE_KEY}
+  });
+  if(!response.ok)throw new Error('HTTP '+response.status);
+  const rows=await response.json();
+  vehicles.splice(0,vehicles.length,...rows.map(formatVehicle));
+  renderVehicles();
+ }catch(error){
+  console.error('Chargement du stock JSVD impossible:',error);
+  stockCount.textContent='Stock temporairement indisponible';
+  emptyStock.style.display='block';
+  emptyStock.querySelector('p').textContent='Le catalogue est momentanément indisponible. Contactez-nous pour connaître les véhicules disponibles.';
+ }
+}
 function renderVehicles(){
  stockCount.textContent=vehicles.length+' véhicule'+(vehicles.length>1?'s':'')+' disponible'+(vehicles.length>1?'s':'');
  emptyStock.style.display=vehicles.length?'none':'block';
- vehicleGrid.innerHTML=vehicles.map((v,i)=>`<article class="vehicle-card reveal"><img class="vehicle-photo" src="${v.image}" alt="${v.name}" loading="lazy"><div class="vehicle-body"><h3>${v.name}</h3><div class="vehicle-meta">${[v.year,v.mileage,v.fuel,v.transmission].filter(Boolean).join(' · ')}</div><div class="vehicle-bottom"><span class="vehicle-price">${v.price}</span><button class="vehicle-more" data-vehicle="${i}" type="button">Voir le véhicule <i class="fa-solid fa-arrow-right"></i></button></div></div></article>`).join('');
+ vehicleGrid.innerHTML=vehicles.map((v,i)=>`<article class="vehicle-card reveal"><img class="vehicle-photo" src="${v.image}" alt="${v.name}" loading="lazy" onerror="this.style.display='none'"><div class="vehicle-body"><h3>${v.name}</h3><div class="vehicle-meta">${[v.year,v.mileage,v.fuel,v.transmission].filter(Boolean).join(' · ')}</div><div class="vehicle-bottom"><span class="vehicle-price">${v.price}</span><button class="vehicle-more" data-vehicle="${i}" type="button">Voir le véhicule <i class="fa-solid fa-arrow-right"></i></button></div></div></article>`).join('');
  vehicleGrid.querySelectorAll('[data-vehicle]').forEach(b=>b.addEventListener('click',()=>showVehicle(Number(b.dataset.vehicle))));
  vehicleGrid.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
 }
@@ -132,7 +165,7 @@ function closeVehicle(){document.getElementById('vehicle-dialog').classList.remo
 document.getElementById('dialog-close').addEventListener('click',closeVehicle);
 document.getElementById('vehicle-dialog').addEventListener('click',e=>{if(e.target.id==='vehicle-dialog')closeVehicle()});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeVehicle()});
-renderVehicles();
+loadPublishedVehicles();
 
 // Navigation fiable vers le formulaire, y compris depuis le menu mobile et la fiche véhicule.
 document.querySelectorAll('a[href="#contact"]').forEach(link=>link.addEventListener('click',e=>{
