@@ -28,9 +28,30 @@ footer{background:#e8e8ed;padding:42px 0 25px}.foot{display:flex;justify-content
 /* Catalogue véhicules */
 .inventory{padding:88px 0 96px;background:#fff}.inventory-top{display:flex;justify-content:space-between;align-items:end;gap:24px;margin-bottom:30px}.inventory-top h2{font-size:clamp(2rem,4vw,3.3rem);letter-spacing:-.06em}.inventory-top p{color:var(--muted);margin-top:8px}.stock-count{font-size:.8rem;color:var(--muted);white-space:nowrap;background:var(--bg);padding:8px 13px;border-radius:99px}.vehicle-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.vehicle-card{border:1px solid var(--line);border-radius:18px;overflow:hidden;background:#fff;transition:transform .2s,box-shadow .2s}.vehicle-card:hover{transform:translateY(-4px);box-shadow:0 12px 32px rgba(0,0,0,.08)}.vehicle-photo{width:100%;height:205px;object-fit:cover;background:#eee;display:block}.vehicle-body{padding:20px}.vehicle-body h3{font-size:1.08rem;letter-spacing:-.035em}.vehicle-meta{color:var(--muted);font-size:.82rem;margin:7px 0 16px}.vehicle-bottom{display:flex;align-items:center;justify-content:space-between;gap:10px}.vehicle-price{font-size:1.2rem;font-weight:700;letter-spacing:-.04em}.vehicle-more{font-size:.84rem;color:var(--blue);font-weight:600}.empty-stock{border:1px dashed #c7c7cc;border-radius:20px;padding:52px 24px;text-align:center;background:var(--bg)}.empty-stock i{font-size:1.8rem;color:var(--blue);margin-bottom:15px}.empty-stock h3{font-size:1.25rem;letter-spacing:-.04em}.empty-stock p{color:var(--muted);max-width:500px;margin:8px auto 20px;font-size:.92rem}.vehicle-dialog{position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;padding:20px}.vehicle-dialog.open{display:flex}.vehicle-panel{background:#fff;border-radius:22px;width:min(680px,100%);max-height:90vh;overflow:auto;position:relative}.vehicle-panel img{width:100%;height:300px;object-fit:cover}.vehicle-panel-content{padding:25px}.vehicle-panel h2{font-size:1.8rem;letter-spacing:-.05em}.vehicle-panel p{color:var(--muted);margin:10px 0}.dialog-close{position:absolute;right:14px;top:14px;border:0;border-radius:50%;width:38px;height:38px;background:rgba(255,255,255,.92);font-size:1.1rem;cursor:pointer}.vehicle-specs{display:flex;flex-wrap:wrap;gap:9px;margin:16px 0}.vehicle-specs span{background:var(--bg);border-radius:9px;padding:8px 11px;font-size:.82rem}
 
+
+/* Ouverture cinématique */
+#intro-screen{position:fixed;inset:0;z-index:9999;background:#090b0f;color:#fff;display:grid;place-items:center;overflow:hidden;transition:opacity .8s ease,visibility .8s ease}
+#intro-screen::before{content:"";position:absolute;width:min(75vw,720px);aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,rgba(0,113,227,.23),transparent 68%);filter:blur(18px);animation:introGlow 2.6s ease-in-out infinite alternate}
+.intro-content{position:relative;text-align:center;animation:introRise 1s cubic-bezier(.2,.8,.2,1) both}
+.intro-mark{width:76px;height:76px;border:1px solid rgba(255,255,255,.3);border-radius:23px;display:grid;place-items:center;margin:0 auto 24px;font-size:1.5rem;font-weight:800;letter-spacing:-.1em;box-shadow:0 0 50px rgba(0,113,227,.18);animation:markIn 1s cubic-bezier(.16,1,.3,1) both}
+.intro-name{font-size:clamp(1.8rem,6vw,3.2rem);font-weight:700;letter-spacing:-.07em}
+.intro-tag{font-size:.72rem;letter-spacing:.28em;text-transform:uppercase;color:#a6a6ad;margin-top:12px}
+.intro-line{height:2px;width:130px;background:rgba(255,255,255,.15);margin:30px auto 0;overflow:hidden;border-radius:9px}
+.intro-line::after{content:"";display:block;height:100%;width:45%;background:#2997ff;animation:introLoad 1.7s ease-in-out both}
+#intro-screen.done{opacity:0;visibility:hidden;pointer-events:none}
+body.intro-pending{overflow:hidden}
+body.intro-pending main,body.intro-pending header,body.intro-pending footer{opacity:0;transform:translateY(12px)}
+body main,body header,body footer{transition:opacity .8s ease,transform .8s ease}
+@keyframes introRise{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+@keyframes markIn{from{opacity:0;transform:scale(.72) rotate(-8deg)}to{opacity:1;transform:scale(1) rotate(0)}}
+@keyframes introGlow{from{transform:scale(.8);opacity:.55}to{transform:scale(1.15);opacity:1}}
+@keyframes introLoad{from{transform:translateX(-120%)}to{transform:translateX(240%)}}
+@media(prefers-reduced-motion:reduce){#intro-screen{display:none}body.intro-pending main,body.intro-pending header,body.intro-pending footer{opacity:1;transform:none}}
+
 </style>
 </head>
-<body>
+<body class="intro-pending">
+<div id="intro-screen" aria-label="JSVD Auto21"><div class="intro-content"><div class="intro-mark">JS</div><div class="intro-name">JSVD Auto21</div><div class="intro-tag">L’expérience automobile</div><div class="intro-line"></div></div></div>
 <header><div class="wrap nav"><a class="brand" href="#accueil"><span class="brandmark">JS</span> JSVD Auto21</a><button class="menu" id="menu" aria-label="Ouvrir le menu" aria-expanded="false"><i class="fa-solid fa-bars"></i></button><nav class="navlinks" id="navlinks"><a href="#accueil">Accueil</a><a href="#services">Services</a><a href="#vehicules">Véhicules</a><a href="#instagram">Instagram</a><a class="navcta" href="#contact">Nous contacter</a></nav></div></header>
 <main>
 <section class="hero" id="accueil"><div class="wrap"><div class="eyebrow">JSVD AUTO21 · DIJON</div><h1>L'automobile.<br>En toute simplicité.</h1><p class="hero-copy">Le bon véhicule. Le bon conseil. Le bon accompagnement. Découvrez une autre façon de vivre votre projet automobile.</p><div class="actions"><a class="btn btn-blue" href="#contact">Parler de votre projet <i class="fa-solid fa-arrow-right"></i></a><a class="btn btn-link" href="#services">Découvrir nos services <i class="fa-solid fa-chevron-right"></i></a></div><div class="hero-visual" role="img" aria-label="Voiture sportive photographiée en extérieur"></div></div></section>
@@ -59,6 +80,16 @@ footer{background:#e8e8ed;padding:42px 0 25px}.foot{display:flex;justify-content
 <footer><div class="wrap"><div class="foot"><div><div class="foot-brand">JSVD Auto21</div><p>Dijon · Votre partenaire automobile</p></div><div class="foot-links"><a href="#accueil">Accueil</a><a href="#services">Services</a><a href="#vehicules">Véhicules</a><a href="#instagram">Instagram</a><a href="#contact">Contact</a><a href="https://www.instagram.com/jsvd.auto21?igsh=MTV0d2xzcGtzeWM5Mg==" target="_blank" rel="noopener"><i class="fa-brands fa-instagram"></i></a></div></div><div class="copyright">© <span id="year"></span> JSVD Auto21. Tous droits réservés.</div></div></footer>
 <script>
 document.getElementById('year').textContent=new Date().getFullYear();
+
+/* Intro de marque à l'ouverture */
+(function(){
+ const screen=document.getElementById('intro-screen');
+ if(!screen)return;
+ const finish=()=>{screen.classList.add('done');document.body.classList.remove('intro-pending');setTimeout(()=>screen.remove(),900)};
+ window.addEventListener('load',()=>setTimeout(finish,1850),{once:true});
+ setTimeout(finish,3200);
+})();
+
 
 document.getElementById('send-search').addEventListener('click',()=>{
  const model=document.getElementById('wanted-model').value.trim();
