@@ -48,7 +48,7 @@ footer{background:#e8e8ed;padding:42px 0 25px}.foot{display:flex;justify-content
 <section class="inventory" id="vehicules"><div class="wrap">
  <div class="inventory-top reveal"><div><div class="eyebrow">Le stock JSVD</div><h2>Nos véhicules.</h2><p>Découvrez les véhicules disponibles chez JSVD Auto21.</p></div><span class="stock-count" id="stock-count">0 véhicule disponible</span></div>
  <div id="vehicle-grid" class="vehicle-grid"></div>
- <div id="empty-stock" class="empty-stock reveal"><i class="fa-solid fa-car"></i><h3>Notre prochaine sélection arrive.</h3><p>Le catalogue sera mis à jour dès qu’un véhicule sera disponible. Contactez-nous pour nous parler de votre recherche ou connaître les prochaines arrivées.</p><a class="btn btn-blue" href="#contact">Décrire ma recherche <i class="fa-solid fa-arrow-right"></i></a></div>
+ <div id="empty-stock" class="empty-stock reveal"><i class="fa-solid fa-magnifying-glass"></i><h3>On trouve votre prochaine voiture ?</h3><p>Pas de stock affiché actuellement : confiez-nous votre recherche. Décrivez votre projet et JSVD Auto21 vous recontactera pour échanger sur vos critères.</p><div class="search-request"><div class="form-grid"><div class="field"><label for="wanted-model">Véhicule recherché</label><input id="wanted-model" placeholder="Ex. SUV, Peugeot 3008…"></div><div class="field"><label for="wanted-budget">Budget maximum</label><select id="wanted-budget"><option value="">À définir</option><option>Moins de 5 000 €</option><option>5 000 à 10 000 €</option><option>10 000 à 15 000 €</option><option>15 000 à 20 000 €</option><option>20 000 à 30 000 €</option><option>Plus de 30 000 €</option></select></div><div class="field"><label for="wanted-fuel">Motorisation</label><select id="wanted-fuel"><option value="">Sans préférence</option><option>Essence</option><option>Diesel</option><option>Hybride</option><option>Électrique</option></select></div><div class="field"><label for="wanted-gearbox">Boîte de vitesses</label><select id="wanted-gearbox"><option value="">Sans préférence</option><option>Manuelle</option><option>Automatique</option></select></div></div><button class="btn btn-blue" type="button" id="send-search">Envoyer ma recherche <i class="fa-solid fa-arrow-right"></i></button></div></div>
 </div></section>
 <div class="vehicle-dialog" id="vehicle-dialog" role="dialog" aria-modal="true" aria-labelledby="vehicle-title"><div class="vehicle-panel"><button class="dialog-close" id="dialog-close" aria-label="Fermer"><i class="fa-solid fa-xmark"></i></button><img id="detail-image" src="" alt=""><div class="vehicle-panel-content"><div class="eyebrow">Fiche véhicule</div><h2 id="vehicle-title"></h2><div class="vehicle-specs" id="detail-specs"></div><h3 id="detail-price"></h3><p id="detail-description"></p><a class="btn btn-blue" id="detail-contact" href="#contact">Demander des informations <i class="fa-solid fa-arrow-right"></i></a></div></div></div>
 
@@ -59,6 +59,20 @@ footer{background:#e8e8ed;padding:42px 0 25px}.foot{display:flex;justify-content
 <footer><div class="wrap"><div class="foot"><div><div class="foot-brand">JSVD Auto21</div><p>Dijon · Votre partenaire automobile</p></div><div class="foot-links"><a href="#accueil">Accueil</a><a href="#services">Services</a><a href="#vehicules">Véhicules</a><a href="#instagram">Instagram</a><a href="#contact">Contact</a><a href="https://www.instagram.com/jsvd.auto21?igsh=MTV0d2xzcGtzeWM5Mg==" target="_blank" rel="noopener"><i class="fa-brands fa-instagram"></i></a></div></div><div class="copyright">© <span id="year"></span> JSVD Auto21. Tous droits réservés.</div></div></footer>
 <script>
 document.getElementById('year').textContent=new Date().getFullYear();
+
+document.getElementById('send-search').addEventListener('click',()=>{
+ const model=document.getElementById('wanted-model').value.trim();
+ const budget=document.getElementById('wanted-budget').value;
+ const fuel=document.getElementById('wanted-fuel').value;
+ const gearbox=document.getElementById('wanted-gearbox').value;
+ const details=['Recherche de véhicule',model&&'Véhicule : '+model,budget&&'Budget : '+budget,fuel&&'Motorisation : '+fuel,gearbox&&'Boîte : '+gearbox].filter(Boolean).join('\\n');
+ document.getElementById('subject').value='Vente de véhicule';
+ const message=document.getElementById('message');
+ message.value=details+'\\n\\nMerci de me recontacter pour échanger sur ma recherche.';
+ document.getElementById('contact').scrollIntoView({behavior:'smooth'});
+ setTimeout(()=>document.getElementById('name').focus({preventScroll:true}),550);
+});
+
 
 /* STOCK: ajouter ici les véhicules réellement disponibles. */
 const vehicles = [];
