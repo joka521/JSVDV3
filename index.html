@@ -126,8 +126,22 @@ function formatVehicle(v){
   year:v.year?String(v.year):'',mileage:v.mileage!=null?Number(v.mileage).toLocaleString('fr-FR')+' km':'',
   fuel:v.fuel||'',transmission:v.gearbox||'',power:v.power_hp?v.power_hp+' ch':'',
   price:v.price!=null?Number(v.price).toLocaleString('fr-FR')+' €':'Prix sur demande',
-  description:v.description||'',image:imagePath?publicPhotoUrl(imagePath):'',
+  description:v.description||'',imagePath,image:'',
  };
+}
+async function getPublishedPhotoUrl(path){
+ if(!path)return '';
+ const objectPath=path.split('/').map(encodeURIComponent).join('/');
+ const response=await fetch(SUPABASE_URL+'/storage/v1/object/sign/'+PHOTO_BUCKET+'/'+objectPath,{
+  method:'POST',
+  headers:{apikey:SUPABASE_KEY,Authorization:'Bearer '+SUPABASE_KEY,'Content-Type':'application/json'},
+  body:JSON.stringify({expiresIn:3600})
+ });
+ if(!response.ok)throw new Error('Impossible de générer le lien sécurisé de la photo');
+ const result=await response.json();
+ const signed=result.signedURL||result.signedUrl;
+ if(!signed)throw new Error('Lien photo absent');
+ return signed.startsWith('http')?signed:SUPABASE_URL+'/storage/v1'+(signed.startsWith('/')?signed:'/'+signed);
 }
 async function loadPublishedVehicles(){
  stockCount.textContent='Chargement du stock…';
@@ -137,7 +151,12 @@ async function loadPublishedVehicles(){
   });
   if(!response.ok)throw new Error('HTTP '+response.status);
   const rows=await response.json();
-  vehicles.splice(0,vehicles.length,...rows.map(formatVehicle));
+  const formatted=rows.map(formatVehicle);
+  await Promise.all(formatted.map(async v=>{
+   try{v.image=await getPublishedPhotoUrl(v.imagePath)}
+   catch(error){console.warn('Photo indisponible pour',v.name,error)}
+  }));
+  vehicles.splice(0,vehicles.length,...formatted);
   renderVehicles();
  }catch(error){
   console.error('Chargement du stock JSVD impossible:',error);
