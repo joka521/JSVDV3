@@ -131,6 +131,19 @@ document.getElementById('vehicle-dialog').addEventListener('click',e=>{if(e.targ
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeVehicle()});
 renderVehicles();
 
+// Navigation fiable vers le formulaire, y compris depuis le menu mobile et la fiche véhicule.
+document.querySelectorAll('a[href="#contact"]').forEach(link=>link.addEventListener('click',e=>{
+ e.preventDefault();
+ const target=document.getElementById('contact');
+ const nav=document.getElementById('navlinks'),menuButton=document.getElementById('menu');
+ if(nav&&menuButton){nav.classList.remove('open');menuButton.setAttribute('aria-expanded','false');menuButton.innerHTML='<i class="fa-solid fa-bars"></i>'}
+ const dialog=document.getElementById('vehicle-dialog');
+ if(dialog&&dialog.classList.contains('open')){dialog.classList.remove('open');document.body.style.overflow=''}
+ const top=target.getBoundingClientRect().top+window.scrollY-(document.querySelector('header')?.offsetHeight||0)-12;
+ window.history.replaceState(null,'','#contact');
+ window.scrollTo({top,behavior:'smooth'});
+}));
+
 const menu=document.getElementById('menu'),links=document.getElementById('navlinks');menu.addEventListener('click',()=>{const open=links.classList.toggle('open');menu.setAttribute('aria-expanded',String(open));menu.innerHTML=open?'<i class="fa-solid fa-xmark"></i>':'<i class="fa-solid fa-bars"></i>'});links.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{links.classList.remove('open');menu.setAttribute('aria-expanded','false');menu.innerHTML='<i class="fa-solid fa-bars"></i>'}));
 const observer=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');observer.unobserve(e.target)}}),{threshold:.12});document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
 const JSVD_LEADS_ENDPOINT='https://jsvd-auto21-dealer-hub.lovable.app/api/public/leads';
