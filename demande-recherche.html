@@ -36,9 +36,9 @@ form.addEventListener('submit',async e=>{
  e.preventDefault();status.textContent='';status.className='status';
  const data=new FormData(form);
  const year=(data.get('wanted_year')||'').trim();
- if(year && (!/^\\d{4}$/.test(year)||Number(year)<1950||Number(year)>new Date().getFullYear()+1)){status.textContent='Vérifiez l’année souhaitée.';status.classList.add('err');return;}
- const extra=year?'Année minimale souhaitée : '+year+'\\n':'';
- data.set('message',[extra,data.get('message')].filter(Boolean).join('\\n'));
+ if(year && (!/^\d{4}$/.test(year)||Number(year)<1950||Number(year)>new Date().getFullYear()+1)){status.textContent='Vérifiez l’année souhaitée.';status.classList.add('err');return;}
+ const extra=year?'Année minimale souhaitée : '+year+'\n':'';
+ data.set('message',[extra,data.get('message')].filter(Boolean).join('\n'));
  data.set('request_type','recherche');
  button.disabled=true;button.textContent='Envoi en cours…';
  try{
