@@ -121,7 +121,19 @@ document.getElementById('year').textContent=new Date().getFullYear();
 (function(){
  const screen=document.getElementById('intro-screen');
  if(!screen)return;
- const finish=()=>{screen.classList.add('done');document.body.classList.remove('intro-pending');setTimeout(()=>screen.remove(),900)};
+ // Sur la page d'accueil, empêcher la restauration d'une ancienne position
+ // de défilement pendant que l'écran d'ouverture masque le contenu.
+ const keepAtTop=!window.location.hash;
+ if(keepAtTop){
+  if('scrollRestoration' in history)history.scrollRestoration='manual';
+  window.scrollTo(0,0);
+ }
+ const finish=()=>{
+  screen.classList.add('done');
+  document.body.classList.remove('intro-pending');
+  if(keepAtTop)requestAnimationFrame(()=>window.scrollTo(0,0));
+  setTimeout(()=>screen.remove(),900);
+ };
  window.addEventListener('load',()=>setTimeout(finish,1850),{once:true});
  setTimeout(finish,3200);
 })();
